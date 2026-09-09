@@ -122,12 +122,91 @@ RETRIEVAL_TIMING_BUDGET_MS: int = 100    # target FAISS retrieval latency (PRD)
 SIMILARITY_THRESHOLD: float = 0.65
 
 # =========================================================================== #
-# Generation (Phase 5)
+# Generation + RAG pipeline (Phase 5)
 # =========================================================================== #
 MAX_NEW_TOKENS: int = 512
 TEMPERATURE: float = 0.0                 # deterministic, grounded answers
 TOP_P: float = 1.0
 LLM_CONTEXT_WINDOW: int = 4096
+MAX_QUERY_CHARS: int = 1000             # longer queries are truncated
+MAX_CONTEXT_CHARS: int = 6000          # cap on retrieved context fed to the LLM
+
+# A distinctive fragment of FALLBACK_MESSAGE — used to detect when the LLM has
+# parroted the refusal so the pipeline can treat it as a fallback.
+REFUSAL_MARKER: str = "do not have sufficient legal documentation"
+
+# Per-language instruction appended to the grounded prompt. Citations in
+# [Article X, Clause Y] form are always kept verbatim / in English.
+LANGUAGE_INSTRUCTIONS: dict[str, str] = {
+    "en": "Respond in clear, simple English.",
+    "hi": "Respond only in Hindi (हिन्दी). Keep every [Article X, Clause Y] "
+          "citation exactly as given.",
+    "ur": "Respond only in Urdu (اردو). Keep every [Article X, Clause Y] "
+          "citation exactly as given.",
+    "ml": "Respond only in Malayalam (മലയാളം). Keep every [Article X, Clause Y] "
+          "citation exactly as given.",
+    "ar": "Respond only in Arabic (العربية). Keep every [Article X, Clause Y] "
+          "citation exactly as given.",
+}
+
+# Localised version of the "no answer in the offline database" notice. The
+# helpline number and website are never translated. English stays verbatim to
+# FALLBACK_MESSAGE (PRD §4.2).
+LOCALIZED_FALLBACK: dict[str, str] = {
+    "en": (
+        "I do not have sufficient legal documentation in my offline database to "
+        "answer this question. Please contact MOHRE directly at 80084 or visit "
+        "www.mohre.gov.ae."
+    ),
+    "hi": (
+        "मेरे ऑफ़लाइन डेटाबेस में इस प्रश्न का उत्तर देने के लिए पर्याप्त कानूनी "
+        "दस्तावेज़ नहीं हैं। कृपया MOHRE से सीधे 80084 पर संपर्क करें या "
+        "www.mohre.gov.ae पर जाएँ।"
+    ),
+    "ur": (
+        "میرے آف لائن ڈیٹابیس میں اس سوال کا جواب دینے کے لیے کافی قانونی "
+        "دستاویزات موجود نہیں ہیں۔ براہِ کرم MOHRE سے براہِ راست 80084 پر رابطہ "
+        "کریں یا www.mohre.gov.ae ملاحظہ کریں۔"
+    ),
+    "ml": (
+        "ഈ ചോദ്യത്തിന് ഉത്തരം നൽകാൻ ആവശ്യമായ നിയമ രേഖകൾ എന്റെ ഓഫ്‌ലൈൻ "
+        "ഡാറ്റാബേസിൽ ഇല്ല. ദയവായി MOHRE-യെ നേരിട്ട് 80084 എന്ന നമ്പറിൽ "
+        "ബന്ധപ്പെടുക അല്ലെങ്കിൽ www.mohre.gov.ae സന്ദർശിക്കുക."
+    ),
+    "ar": (
+        "لا تتوفر لديّ وثائق قانونية كافية في قاعدة البيانات دون اتصال للإجابة "
+        "عن هذا السؤال. يُرجى الاتصال بوزارة الموارد البشرية والتوطين مباشرة على "
+        "الرقم 80084 أو زيارة www.mohre.gov.ae."
+    ),
+}
+
+LOCALIZED_DISCLAIMER: dict[str, str] = {
+    "en": (
+        "Disclaimer: informational guidance produced offline from a fixed "
+        "snapshot of UAE Labour Law. Not legal advice. For binding decisions "
+        "contact MOHRE at 80084 or www.mohre.gov.ae."
+    ),
+    "hi": (
+        "अस्वीकरण: यह जानकारी UAE श्रम कानून के एक निश्चित संस्करण से ऑफ़लाइन "
+        "तैयार की गई है। यह कानूनी सलाह नहीं है। बाध्यकारी निर्णयों के लिए MOHRE "
+        "से 80084 पर संपर्क करें या www.mohre.gov.ae देखें।"
+    ),
+    "ur": (
+        "دستبرداری: یہ معلومات UAE کے محنت قانون کے ایک مقررہ نسخے سے آف لائن "
+        "تیار کی گئی ہیں۔ یہ قانونی مشورہ نہیں ہے۔ پابند فیصلوں کے لیے MOHRE سے "
+        "80084 پر رابطہ کریں یا www.mohre.gov.ae دیکھیں۔"
+    ),
+    "ml": (
+        "നിരാകരണം: UAE തൊഴിൽ നിയമത്തിന്റെ ഒരു നിശ്ചിത പതിപ്പിൽ നിന്ന് "
+        "ഓഫ്‌ലൈനായി തയ്യാറാക്കിയ വിവരണം. നിയമോപദേശമല്ല. ബാധകമായ തീരുമാനങ്ങൾക്ക് "
+        "MOHRE-യെ 80084-ൽ ബന്ധപ്പെടുക അല്ലെങ്കിൽ www.mohre.gov.ae സന്ദർശിക്കുക."
+    ),
+    "ar": (
+        "إخلاء مسؤولية: إرشادات معلوماتية أُنشئت دون اتصال من نسخة ثابتة من قانون "
+        "العمل الإماراتي. ليست استشارة قانونية. للقرارات المُلزمة اتصل بوزارة "
+        "الموارد البشرية والتوطين على 80084 أو www.mohre.gov.ae."
+    ),
+}
 
 # =========================================================================== #
 # Localisation

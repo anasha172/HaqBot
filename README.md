@@ -17,7 +17,7 @@ No cloud. No telemetry. No network calls. Runs on low-spec Android/iOS devices a
 | 2 | Local offline auth (PIN) + SQLite profile store | ✅ done |
 | 3 | PDF ingestion, chunking & metadata tagging | ✅ done |
 | 4 | OpenVINO INT8 quantization + FAISS index build | ✅ done |
-| 5 | RAG pipeline + anti-hallucination guardrails | ⬜ pending |
+| 5 | RAG pipeline + anti-hallucination guardrails | ✅ done |
 | 6 | Mobile-first Streamlit UI + air-gapped test suite | ⬜ pending |
 
 ---
@@ -59,6 +59,7 @@ python -m src.quantization --check       # report export status
 # Then, fully offline:
 python -m src.ingestion                  # data/raw/*.pdf -> data/processed/chunks.jsonl
 python -m src.vectorstore                # chunks.jsonl -> data/processed/faiss_index/
+python -m src.pipeline "how is end of service gratuity calculated?" --language en
 ```
 
 Ingestion parses Article / Clause structure, chunks at 450/50, and writes one
