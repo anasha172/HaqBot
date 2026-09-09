@@ -1,0 +1,11 @@
+# Normalise line endings: text files stored LF in the repo, checked out native.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary
+*.docx binary
+*.faiss binary
+*.pkl binary
+*.bin binary
+*.xml -text

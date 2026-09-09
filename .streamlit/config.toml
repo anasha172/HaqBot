@@ -1,0 +1,45 @@
+# HaqBot — offline, mobile-first Streamlit configuration.
+#
+# Design goals enforced here:
+#   * Zero telemetry / zero outbound network calls (air-gapped operation).
+#   * No raw tracebacks ever shown to end users.
+#   * Light, low-memory footprint suitable for low-spec devices.
+#
+# NOTE on mobile viewport: Streamlit already injects
+#   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+# into every page, so the touch-friendly 360px+ layout is driven by the custom
+# CSS added in Phase 6, not by a config key (none exists for the viewport tag).
+
+[browser]
+# Air-gapped telemetry block (PRD §4.1).
+gatherUsageStats = false
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+enableStaticServing = true          # serves PWA manifest / icons later
+fileWatcherType = "none"            # lower CPU/RAM on low-spec devices
+runOnSave = false
+maxUploadSize = 5                   # MB — nothing large is ever uploaded
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = "none"           # zero raw tracebacks to users
+showSidebarNavigation = false
+
+[runner]
+magicEnabled = false               # small perf win; we render explicitly
+fastReruns = true
+
+[theme]
+base = "light"
+primaryColor = "#e11d48"           # rose / raspberry brand accent
+backgroundColor = "#ffffff"        # white cards / surfaces
+secondaryBackgroundColor = "#f5f6f8"  # app canvas
+textColor = "#14161b"              # near-black ink
+font = "sans serif"
+
+[global]
+developmentMode = false
+showWarningOnDirectExecution = false
