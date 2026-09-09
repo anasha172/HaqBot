@@ -33,6 +33,10 @@ models/*
 data/raw/*
 !data/raw/.gitkeep
 
+# --- Runtime (start.py / stop.py) --------------------------------------------
+.haqbot_run.json
+.haqbot.log
+
 # --- OS / editor ----------------------------------------------------------------
 .DS_Store
 Thumbs.db
