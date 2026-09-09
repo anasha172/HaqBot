@@ -16,7 +16,7 @@ No cloud. No telemetry. No network calls. Runs on low-spec Android/iOS devices a
 | 1 | Project setup, mobile viewport & security config | ✅ done |
 | 2 | Local offline auth (PIN) + SQLite profile store | ✅ done |
 | 3 | PDF ingestion, chunking & metadata tagging | ✅ done |
-| 4 | OpenVINO INT8 quantization + FAISS index build | ⬜ pending |
+| 4 | OpenVINO INT8 quantization + FAISS index build | ✅ done |
 | 5 | RAG pipeline + anti-hallucination guardrails | ⬜ pending |
 | 6 | Mobile-first Streamlit UI + air-gapped test suite | ⬜ pending |
 
@@ -51,12 +51,21 @@ Drop the source PDFs (UAE Federal Decree-Law No. 33, WPS regulations, MOHRE
 directives) into `data/raw/`, then:
 
 ```bash
-python -m src.ingestion              # data/raw/*.pdf -> data/processed/chunks.jsonl
+# One-time, on a build machine WITH network (this is the only online step):
+pip install -r requirements.txt          # pulls in openvino / optimum-intel / nncf
+python -m src.quantization all           # -> models/e5-small-ov, models/qwen2.5-1.5b-ov-int8
+python -m src.quantization --check       # report export status
+
+# Then, fully offline:
+python -m src.ingestion                  # data/raw/*.pdf -> data/processed/chunks.jsonl
+python -m src.vectorstore                # chunks.jsonl -> data/processed/faiss_index/
 ```
 
-This parses Article / Clause structure, chunks at 450/50, and writes one JSON
-record per chunk with full citation metadata. Phase 4 turns this into the FAISS
-index.
+Ingestion parses Article / Clause structure, chunks at 450/50, and writes one
+JSON record per chunk with full citation metadata. The vector store embeds those
+chunks with the INT8 e5 model and persists a FAISS `IndexFlatIP` (cosine) plus a
+docstore and `meta.json`. Retrieval below cosine `0.65` is flagged
+`is_confident == False` for the Phase 5 guardrail.
 
 ### Mobile / low-spec testing
 

@@ -37,8 +37,10 @@ DB_PATH: Path = DATA_DIR / "local_user.db"
 
 # Persisted retrieval artefacts (built in Phase 4).
 FAISS_INDEX_DIR: Path = PROCESSED_DIR / "faiss_index"
+VECTORSTORE_DIR: Path = FAISS_INDEX_DIR
 FAISS_INDEX_PATH: Path = FAISS_INDEX_DIR / "index.faiss"
-FAISS_STORE_PATH: Path = FAISS_INDEX_DIR / "index.pkl"
+VECTORSTORE_DOCS_PATH: Path = FAISS_INDEX_DIR / "docstore.jsonl"
+VECTORSTORE_META_PATH: Path = FAISS_INDEX_DIR / "meta.json"
 CHUNKS_META_PATH: Path = PROCESSED_DIR / "chunks.jsonl"
 
 # OpenVINO IR model directories (populated by the offline quantization step).
@@ -73,6 +75,17 @@ E5_PASSAGE_PREFIX: str = "passage: "
 EMBEDDING_DIM: int = 384
 
 # =========================================================================== #
+# OpenVINO export via optimum-cli (Phase 4 — build-time, run once with network)
+# =========================================================================== #
+OPTIMUM_CLI: str = "optimum-cli"
+EMBEDDING_EXPORT_TASK: str = "feature-extraction"
+LLM_EXPORT_TASK: str = "text-generation-with-past"
+LLM_INT8_RATIO: str = "1.0"             # fraction of layers kept at INT8
+EMBEDDING_MAX_TOKENS: int = 512
+# Files that must exist (non-empty) for an export to count as complete.
+OV_MODEL_FILES: tuple[str, ...] = ("openvino_model.xml", "openvino_model.bin")
+
+# =========================================================================== #
 # Ingestion / chunking (Phase 3)
 # =========================================================================== #
 CHUNK_SIZE: int = 450
@@ -100,6 +113,7 @@ KNOWN_LEGAL_SOURCES: tuple[tuple[str, str], ...] = (
 # Retrieval + anti-hallucination guardrail (Phase 5)
 # =========================================================================== #
 RETRIEVAL_TOP_K: int = 4
+RETRIEVAL_TIMING_BUDGET_MS: int = 100    # target FAISS retrieval latency (PRD)
 
 # Embeddings are L2-normalised and the FAISS index uses inner product, so a
 # match score is cosine similarity in [-1.0, 1.0] (higher == more relevant).
