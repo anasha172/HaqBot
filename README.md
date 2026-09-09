@@ -15,7 +15,7 @@ No cloud. No telemetry. No network calls. Runs on low-spec Android/iOS devices a
 | :---- | :---- | :---- |
 | 1 | Project setup, mobile viewport & security config | ✅ done |
 | 2 | Local offline auth (PIN) + SQLite profile store | ✅ done |
-| 3 | PDF ingestion, chunking & metadata tagging | ⬜ pending |
+| 3 | PDF ingestion, chunking & metadata tagging | ✅ done |
 | 4 | OpenVINO INT8 quantization + FAISS index build | ⬜ pending |
 | 5 | RAG pipeline + anti-hallucination guardrails | ⬜ pending |
 | 6 | Mobile-first Streamlit UI + air-gapped test suite | ⬜ pending |
@@ -44,6 +44,19 @@ streamlit run app.py
 
 The app binds to `localhost` only, ships with telemetry disabled
 (`.streamlit/config.toml`), and performs zero outbound requests at runtime.
+
+### Building the offline knowledge base
+
+Drop the source PDFs (UAE Federal Decree-Law No. 33, WPS regulations, MOHRE
+directives) into `data/raw/`, then:
+
+```bash
+python -m src.ingestion              # data/raw/*.pdf -> data/processed/chunks.jsonl
+```
+
+This parses Article / Clause structure, chunks at 450/50, and writes one JSON
+record per chunk with full citation metadata. Phase 4 turns this into the FAISS
+index.
 
 ### Mobile / low-spec testing
 

@@ -77,6 +77,24 @@ EMBEDDING_DIM: int = 384
 # =========================================================================== #
 CHUNK_SIZE: int = 450
 CHUNK_OVERLAP: int = 50
+MIN_CHUNK_CHARS: int = 60                 # drop fragments smaller than this
+CHUNK_SEPARATORS: tuple[str, ...] = ("\n\n", "\n", ". ", "; ", " ", "")
+INGEST_LANGUAGE: str = "en"              # official UAE legal PDFs are English
+
+# Substring (normalised to lowercase, non-alphanumerics -> '-') matched against
+# each PDF's file stem -> canonical citation title. Unmatched files fall back to
+# a title-cased stem so ingestion never fails on an unknown document.
+KNOWN_LEGAL_SOURCES: tuple[tuple[str, str], ...] = (
+    ("decree-law-33", "Federal Decree-Law No. 33 of 2021"),
+    ("decree-law-no-33", "Federal Decree-Law No. 33 of 2021"),
+    ("law-33", "Federal Decree-Law No. 33 of 2021"),
+    ("labour-law", "Federal Decree-Law No. 33 of 2021"),
+    ("cabinet-resolution-1", "Cabinet Resolution No. 1 of 2022 (Executive Regulations)"),
+    ("executive-regulation", "Cabinet Resolution No. 1 of 2022 (Executive Regulations)"),
+    ("wps", "Wage Protection System (WPS) Regulations"),
+    ("wage-protection", "Wage Protection System (WPS) Regulations"),
+    ("mohre", "MOHRE Ministerial Directives"),
+)
 
 # =========================================================================== #
 # Retrieval + anti-hallucination guardrail (Phase 5)
