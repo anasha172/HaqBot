@@ -30,6 +30,7 @@ streamlit==1.61.1
 
 # --- Core utilities -------------------------------------------------------------
 numpy==2.3.3
+cryptography==48.0.0        # Fernet at-rest encryption for local profile fields
 
 # --- Testing -----------------------------------------------------------------
 pytest==9.1.1

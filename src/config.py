@@ -121,13 +121,33 @@ FONT_SCALE_OPTIONS: dict[str, float] = {
 DEFAULT_FONT_SCALE: str = "Normal"
 
 # =========================================================================== #
-# Local auth (Phase 2)
+# Local auth (Phase 2) — 100% on-device, no network, no remote server.
 # =========================================================================== #
 PIN_LENGTH: int = 4
-PIN_HASH_ALGORITHM: str = "sha256"       # PIN hashed before storage (PRD §4.1)
+# PIN is never stored; only a PBKDF2-HMAC-SHA256 digest is kept (PRD §4.1).
+PIN_HASH_ALGORITHM: str = "pbkdf2_sha256"
 PBKDF2_ITERATIONS: int = 200_000
+PIN_SALT_BYTES: int = 16
 GUEST_USERNAME: str = "guest"
 MAX_PIN_ATTEMPTS: int = 5
+LOCKOUT_COOLDOWN_SECONDS: int = 300      # 5-minute cooldown after MAX attempts
+
+# Sensitive free-text profile fields are Fernet-encrypted at rest with a key
+# derived from the user's PIN; language/font stay in clear so the login screen
+# can localise itself before authentication. Guest profiles store no encrypted
+# fields at all (quick access = no secret to protect).
+ENCRYPTED_PROFILE_FIELDS: tuple[str, ...] = ("contract_type", "worker_sector")
+CONTRACT_TYPES: tuple[str, ...] = ("Not specified", "Limited", "Unlimited")
+
+DB_SCHEMA_VERSION: int = 1
+
+# Local SQLite pragmas — foreign keys on, small footprint, no shared cache.
+SQLITE_PRAGMAS: dict[str, str] = {
+    "foreign_keys": "ON",
+    "journal_mode": "TRUNCATE",
+    "synchronous": "FULL",
+    "temp_store": "MEMORY",
+}
 
 # =========================================================================== #
 # Official contacts / legal references

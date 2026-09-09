@@ -14,7 +14,7 @@ No cloud. No telemetry. No network calls. Runs on low-spec Android/iOS devices a
 | Phase | Scope | State |
 | :---- | :---- | :---- |
 | 1 | Project setup, mobile viewport & security config | ✅ done |
-| 2 | Local offline auth (PIN) + SQLite profile store | ⬜ pending |
+| 2 | Local offline auth (PIN) + SQLite profile store | ✅ done |
 | 3 | PDF ingestion, chunking & metadata tagging | ⬜ pending |
 | 4 | OpenVINO INT8 quantization + FAISS index build | ⬜ pending |
 | 5 | RAG pipeline + anti-hallucination guardrails | ⬜ pending |

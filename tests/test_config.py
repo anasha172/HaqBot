@@ -180,8 +180,11 @@ class TestAuthConstants:
         assert config.PIN_LENGTH == 4
 
     def test_hash_algorithm_declared(self):
-        assert config.PIN_HASH_ALGORITHM == "sha256"
+        # PRD §4.1 mandates SHA-256; we use it via PBKDF2-HMAC-SHA256.
+        assert config.PIN_HASH_ALGORITHM == "pbkdf2_sha256"
+        assert "sha256" in config.PIN_HASH_ALGORITHM
         assert config.PBKDF2_ITERATIONS >= 100_000
+        assert config.PIN_SALT_BYTES >= 16
 
     def test_guest_username(self):
         assert config.GUEST_USERNAME == "guest"
