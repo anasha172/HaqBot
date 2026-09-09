@@ -294,7 +294,9 @@ class AuthManager:
     # -- connection ------------------------------------------------------------
     def _connection(self) -> sqlite3.Connection:
         if self._conn is None:
-            conn = sqlite3.connect(self.db_path)
+            # check_same_thread=False: Streamlit reruns may hop threads; access
+            # is still single-user and serialised by the app.
+            conn = sqlite3.connect(self.db_path, check_same_thread=False)
             conn.row_factory = sqlite3.Row
             for name, value in config.SQLITE_PRAGMAS.items():
                 conn.execute(f"PRAGMA {name}={value}")

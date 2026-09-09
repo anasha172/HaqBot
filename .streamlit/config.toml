@@ -16,8 +16,7 @@ gatherUsageStats = false
 
 [server]
 headless = true
-enableCORS = false
-enableXsrfProtection = true
+enableXsrfProtection = true         # keep CSRF protection (implies CORS on)
 enableStaticServing = true          # serves PWA manifest / icons later
 fileWatcherType = "none"            # lower CPU/RAM on low-spec devices
 runOnSave = false

@@ -18,7 +18,7 @@ No cloud. No telemetry. No network calls. Runs on low-spec Android/iOS devices a
 | 3 | PDF ingestion, chunking & metadata tagging | ✅ done |
 | 4 | OpenVINO INT8 quantization + FAISS index build | ✅ done |
 | 5 | RAG pipeline + anti-hallucination guardrails | ✅ done |
-| 6 | Mobile-first Streamlit UI + air-gapped test suite | ⬜ pending |
+| 6 | Mobile-first Streamlit UI + air-gapped test suite | ✅ done |
 
 ---
 
@@ -38,12 +38,19 @@ pip install -r requirements.txt
 # 3. Run the test suite
 pytest
 
-# 4. Launch the app (available from Phase 6)
+# 4. Launch the app
 streamlit run app.py
 ```
 
 The app binds to `localhost` only, ships with telemetry disabled
 (`.streamlit/config.toml`), and performs zero outbound requests at runtime.
+Three screens: **Local Auth / PIN → Multilingual Chat → Profile & Settings**,
+with a sticky offline header, expandable "Legal Sources & Citations" panel, a
+MOHRE `80084` helpline button, language + text-size controls, and a one-tap
+"clear all data on this device" purge.
+
+`HAQBOT_DB_PATH` and `HAQBOT_INDEX_DIR` env vars relocate the on-device data
+(SQLite DB and FAISS index) if you don't want the defaults under `data/`.
 
 ### Building the offline knowledge base
 

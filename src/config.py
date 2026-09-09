@@ -340,11 +340,160 @@ LEGAL_SOURCE_DOCUMENTS: tuple[str, ...] = (
 )
 
 LOCAL_MODEL_CHIP: str = "Qwen2.5 INT8 Offline"
+OFFLINE_BADGE_TEXT: str = "100% Air-Gapped"
+
+# =========================================================================== #
+# UI copy (Phase 6). English is the source of truth; missing translations fall
+# back to English via `ui_text()`. Chat *answers* are localised by the pipeline.
+# =========================================================================== #
+UI_STRINGS: dict[str, dict[str, str]] = {
+    "app_tagline": {
+        "en": "Offline UAE Labour Rights Assistant",
+        "hi": "ऑफ़लाइन यूएई श्रम अधिकार सहायक",
+        "ur": "آف لائن یو اے ای محنت حقوق معاون",
+        "ml": "ഓഫ്‌ലൈൻ യുഎഇ തൊഴിൽ അവകാശ സഹായി",
+        "ar": "مساعد حقوق العمل في الإمارات دون اتصال",
+    },
+    "choose_language": {
+        "en": "Choose your language", "hi": "अपनी भाषा चुनें",
+        "ur": "اپنی زبان منتخب کریں", "ml": "നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക",
+        "ar": "اختر لغتك",
+    },
+    "enter_pin": {
+        "en": "Enter your 4-digit PIN", "hi": "अपना 4-अंकों का पिन डालें",
+        "ur": "اپنا 4 ہندسوں کا پن درج کریں", "ml": "നിങ്ങളുടെ 4-അക്ക പിൻ നൽകുക",
+        "ar": "أدخل رقم التعريف الشخصي المكوّن من 4 أرقام",
+    },
+    "create_pin": {
+        "en": "Create a 4-digit PIN", "hi": "4-अंकों का पिन बनाएँ",
+        "ur": "4 ہندسوں کا پن بنائیں", "ml": "ഒരു 4-അക്ക പിൻ ഉണ്ടാക്കുക",
+        "ar": "أنشئ رقم تعريف شخصي من 4 أرقام",
+    },
+    "confirm_pin": {
+        "en": "Confirm PIN", "hi": "पिन की पुष्टि करें", "ur": "پن کی تصدیق کریں",
+        "ml": "പിൻ സ്ഥിരീകരിക്കുക", "ar": "تأكيد رقم التعريف الشخصي",
+    },
+    "sign_in": {
+        "en": "Sign in", "hi": "साइन इन करें", "ur": "سائن ان کریں",
+        "ml": "സൈൻ ഇൻ ചെയ്യുക", "ar": "تسجيل الدخول",
+    },
+    "create_account": {
+        "en": "Set up PIN", "hi": "पिन सेट करें", "ur": "پن ترتیب دیں",
+        "ml": "പിൻ സജ്ജീകരിക്കുക", "ar": "إعداد رقم التعريف",
+    },
+    "continue_as_guest": {
+        "en": "Continue as guest", "hi": "अतिथि के रूप में जारी रखें",
+        "ur": "بطور مہمان جاری رکھیں", "ml": "അതിഥിയായി തുടരുക",
+        "ar": "المتابعة كضيف",
+    },
+    "chat_title": {
+        "en": "Ask about your rights", "hi": "अपने अधिकारों के बारे में पूछें",
+        "ur": "اپنے حقوق کے بارے میں پوچھیں", "ml": "നിങ്ങളുടെ അവകാശങ്ങളെക്കുറിച്ച് ചോദിക്കുക",
+        "ar": "اسأل عن حقوقك",
+    },
+    "ask_placeholder": {
+        "en": "Ask a follow-up about UAE labour law…",
+        "hi": "यूएई श्रम कानून के बारे में पूछें…",
+        "ur": "یو اے ای محنت قانون کے بارے میں پوچھیں…",
+        "ml": "യുഎഇ തൊഴിൽ നിയമത്തെക്കുറിച്ച് ചോദിക്കുക…",
+        "ar": "اطرح سؤالاً عن قانون العمل الإماراتي…",
+    },
+    "answer_eyebrow": {
+        "en": "ANSWER", "hi": "उत्तर", "ur": "جواب", "ml": "ഉത്തരം", "ar": "الإجابة",
+    },
+    "sources_panel_title": {
+        "en": "Legal Sources & Citations (MOHRE / Decree-Law 33)",
+        "hi": "कानूनी स्रोत और उद्धरण (MOHRE / डिक्री-लॉ 33)",
+        "ur": "قانونی ذرائع و حوالہ جات (MOHRE / ڈکری لا 33)",
+        "ml": "നിയമ സ്രോതസ്സുകളും ഉദ്ധരണികളും (MOHRE / ഡിക്രി-ലോ 33)",
+        "ar": "المصادر القانونية والاستشهادات (وزارة الموارد البشرية / المرسوم 33)",
+    },
+    "show_all_sources": {
+        "en": "Show all verified legal sources",
+        "hi": "सभी सत्यापित कानूनी स्रोत दिखाएँ",
+        "ur": "تمام تصدیق شدہ قانونی ذرائع دکھائیں",
+        "ml": "പരിശോധിച്ച എല്ലാ നിയമ സ്രോതസ്സുകളും കാണിക്കുക",
+        "ar": "عرض جميع المصادر القانونية المُوثّقة",
+    },
+    "helpline": {
+        "en": "Call MOHRE 80084", "hi": "MOHRE 80084 पर कॉल करें",
+        "ur": "MOHRE 80084 پر کال کریں", "ml": "MOHRE 80084-ൽ വിളിക്കുക",
+        "ar": "اتصل بـ MOHRE على 80084",
+    },
+    "nav_chat": {
+        "en": "Chat", "hi": "चैट", "ur": "چیٹ", "ml": "ചാറ്റ്", "ar": "المحادثة",
+    },
+    "nav_settings": {
+        "en": "Settings", "hi": "सेटिंग्स", "ur": "ترتیبات", "ml": "ക്രമീകരണങ്ങൾ",
+        "ar": "الإعدادات",
+    },
+    "sign_out": {
+        "en": "Sign out", "hi": "साइन आउट", "ur": "سائن آؤٹ", "ml": "സൈൻ ഔട്ട്",
+        "ar": "تسجيل الخروج",
+    },
+    "settings_title": {
+        "en": "Profile & Settings", "hi": "प्रोफ़ाइल और सेटिंग्स",
+        "ur": "پروفائل اور ترتیبات", "ml": "പ്രൊഫൈലും ക്രമീകരണങ്ങളും",
+        "ar": "الملف الشخصي والإعدادات",
+    },
+    "language_label": {
+        "en": "Language", "hi": "भाषा", "ur": "زبان", "ml": "ഭാഷ", "ar": "اللغة",
+    },
+    "font_size_label": {
+        "en": "Text size", "hi": "पाठ का आकार", "ur": "متن کا سائز",
+        "ml": "വാചക വലുപ്പം", "ar": "حجم النص",
+    },
+    "contract_type_label": {
+        "en": "Contract type", "hi": "अनुबंध प्रकार", "ur": "معاہدے کی قسم",
+        "ml": "കരാർ തരം", "ar": "نوع العقد",
+    },
+    "wipe_button": {
+        "en": "Clear all data on this device",
+        "hi": "इस डिवाइस पर सभी डेटा हटाएँ",
+        "ur": "اس ڈیوائس پر تمام ڈیٹا صاف کریں",
+        "ml": "ഈ ഉപകരണത്തിലെ എല്ലാ ഡാറ്റയും മായ്ക്കുക",
+        "ar": "مسح جميع البيانات على هذا الجهاز",
+    },
+    "wipe_done": {
+        "en": "All local data was erased.", "hi": "सभी स्थानीय डेटा मिटा दिया गया।",
+        "ur": "تمام مقامی ڈیٹا مٹا دیا گیا۔", "ml": "എല്ലാ പ്രാദേശിക ഡാറ്റയും മായ്ച്ചു.",
+        "ar": "تم مسح جميع البيانات المحلية.",
+    },
+    "kb_not_ready": {
+        "en": (
+            "The offline legal knowledge base has not been built on this device "
+            "yet. Please contact MOHRE at 80084 or visit www.mohre.gov.ae."
+        ),
+        "hi": (
+            "इस डिवाइस पर ऑफ़लाइन कानूनी ज्ञान-आधार अभी तैयार नहीं हुआ है। कृपया "
+            "MOHRE से 80084 पर संपर्क करें या www.mohre.gov.ae देखें।"
+        ),
+        "ur": (
+            "اس ڈیوائس پر آف لائن قانونی علمی بنیاد ابھی تیار نہیں ہوئی۔ براہِ کرم "
+            "MOHRE سے 80084 پر رابطہ کریں یا www.mohre.gov.ae دیکھیں۔"
+        ),
+        "ml": (
+            "ഈ ഉപകരണത്തിൽ ഓഫ്‌ലൈൻ നിയമ വിജ്ഞാന ശേഖരം ഇതുവരെ തയ്യാറാക്കിയിട്ടില്ല. "
+            "ദയവായി MOHRE-യെ 80084-ൽ ബന്ധപ്പെടുക അല്ലെങ്കിൽ www.mohre.gov.ae സന്ദർശിക്കുക."
+        ),
+        "ar": (
+            "لم يتم بعد إنشاء قاعدة المعرفة القانونية دون اتصال على هذا الجهاز. "
+            "يُرجى الاتصال بـ MOHRE على 80084 أو زيارة www.mohre.gov.ae."
+        ),
+    },
+}
 
 
 # =========================================================================== #
 # Helpers
 # =========================================================================== #
+def ui_text(key: str, language: str = DEFAULT_LANGUAGE) -> str:
+    """Localised UI string for ``key``; falls back to English then to the key."""
+    entry = UI_STRINGS.get(key, {})
+    return entry.get(language) or entry.get(DEFAULT_LANGUAGE) or key
+
+
+
 def ensure_directories() -> None:
     """Create every runtime directory in :data:`ALL_DIRECTORIES` if missing.
 
